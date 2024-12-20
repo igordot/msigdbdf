@@ -1,0 +1,151 @@
+#' Generate a table of gene details
+#'
+#' Convert the MSigDB SQLite database tables to a single table of gene information.
+#'
+#' @param x A list of data frames returned by `msigdb_sqlite()`.
+#'
+#' @returns A data frame with gene details.
+#'
+#' @export
+gene_set_genes <- function(x) {
+  if (!is.list(x)) {
+    stop("Input must be a list of data frames")
+  }
+  if (nrow(x$MSigDB) != 1) {
+    stop("MSigDB data frame must have one row")
+  }
+
+  # Combine internal and external gene set identifiers
+  mg <- inner_join(x$gene_set, x$gene_set_details, by = c("id" = "gene_set_id"))
+
+  # Keep only the relevant columns
+  mg <- select(mg, "id", gs_id = "systematic_name")
+
+  # Add gene identifiers to link to the source_member table
+  mg <- inner_join(mg, x$gene_set_source_member, by = c("id" = "gene_set_id"))
+
+  # Save the number of gene-geneset pairs before any modifications
+  num_pairs <- nrow(mg)
+
+  # Add source (original) gene identifiers
+  mg <- inner_join(mg, x$source_member, by = c("source_member_id" = "id"))
+
+  # Save the number of source genes before any modifications
+  num_source_genes <- n_distinct(mg$source_id)
+
+  # Add namespace (identifier database and species)
+  mg <- inner_join(mg, x$namespace, by = c("namespace_id" = "id"))
+
+  # Add the official NCBI symbol and ID (not all source genes are mapped to a NCBI gene)
+  mg <- inner_join(mg, x$gene_symbol, by = c("gene_symbol_id" = "id"))
+  mg$NCBI_id <- as.integer(mg$NCBI_id)
+
+  # Save the number of gene-geneset pairs with NCBI gene IDs
+  num_pairs_ncbi <- nrow(mg)
+  num_source_genes_ncbi <- n_distinct(mg$source_id)
+
+  # Most genes should have NCBI IDs
+  if (num_source_genes_ncbi / num_source_genes < 0.8) {
+    stop("Too few genes with NCBI IDs")
+  }
+  if (num_pairs_ncbi / num_pairs < 0.95) {
+    stop("Too few genes with NCBI IDs")
+  }
+
+  # Select and rename columns to match previous msigdbr formatting
+  mg <- select(
+    mg,
+    "gs_id",
+    source_gene = "source_id",
+    source_species = "species_code",
+    db_ncbi_gene = "NCBI_id",
+    db_gene_symbol = "symbol"
+  )
+
+  # Replace gene NA values with empty strings to avoid "NA" genes downstream
+  mg <- replace_na(mg, list(db_ncbi_gene = 0, db_gene_symbol = ""))
+
+  # Keep only the relevant fields
+  mg <- distinct(mg, .data$gs_id, .data$source_gene, .data$db_ncbi_gene, .data$db_gene_symbol)
+
+  # Check that the table seems reasonable
+  if (n_distinct(mg$db_ncbi_gene) < 30000) {
+    stop("Too few gene IDs")
+  }
+  if (n_distinct(mg$db_ncbi_gene) > 50000) {
+    stop("Too many gene IDs")
+  }
+  if (n_distinct(mg$gs_id) < 10000) {
+    stop("Too few geneset IDs")
+  }
+  if (n_distinct(mg$gs_id) > 50000) {
+    stop("Too many geneset IDs")
+  }
+  if (n_distinct(mg$db_ncbi_gene) != n_distinct(mg$db_gene_symbol)) {
+    stop("Gene IDs and symbols do not match")
+  }
+
+  # Create subsets with and without known Ensembl IDs
+  mg <- mutate(
+    mg,
+    db_ensembl_gene =
+      case_when(
+        str_detect(.data$db_gene_symbol, "^ENS[GM]") ~ .data$db_gene_symbol,
+        str_detect(.data$source_gene, "^ENS[GM]") ~ .data$source_gene
+      )
+  )
+  mg_ens <- filter(mg, !is.na(.data$db_ensembl_gene))
+  mg_nonens <- filter(mg, is.na(.data$db_ensembl_gene))
+
+  # Confirm that the source genes are distinct
+  if (length(intersect(mg_ens$source_gene, mg_nonens$source_gene))) {
+    stop("Source genes are overlapping")
+  }
+
+  # Add Ensembl IDs to genes without them
+  ens <- ensembl_genes(x)
+  mg_nonens <- select(mg_nonens, !"db_ensembl_gene")
+  mg_nonens <- left_join(mg_nonens, ens, by = "db_gene_symbol", relationship = "many-to-many")
+
+  # Combine subsets with and without known Ensembl IDs
+  mg <- bind_rows(mg_ens, mg_nonens)
+
+  # Clean up the final table
+  mg <- distinct(
+    mg,
+    .data$db_ncbi_gene,
+    .data$db_gene_symbol,
+    .data$db_ensembl_gene,
+    .data$source_gene,
+    .data$gs_id
+  )
+  mg <- arrange(
+    mg,
+    .data$db_gene_symbol,
+    .data$db_ensembl_gene,
+    .data$source_gene,
+    .data$gs_id
+  )
+
+  # Check that the table seems reasonable
+  if (length(setdiff(drop_na(x$source_member)$source_id, mg$source_gene))) {
+    stop("Some source genes are missing")
+  }
+  if (nrow(mg) / num_pairs < 0.95) {
+    stop("Too many gene-geneset pairs lost")
+  }
+  if (nrow(mg) / num_pairs_ncbi < 0.99) {
+    stop("Too many gene-geneset pairs lost")
+  }
+  if (nrow(mg) / num_pairs_ncbi > 1.01) {
+    stop("Too many genes with multiple Ensembl IDs")
+  }
+  if (n_distinct(mg$db_ncbi_gene) < 30000) {
+    stop("Too few gene NCBI IDs")
+  }
+  if (n_distinct(mg$db_ncbi_gene) > 50000) {
+    stop("Too many gene NCBI IDs")
+  }
+
+  return(mg)
+}

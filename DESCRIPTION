@@ -5,7 +5,8 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Igor", "Dolgalev", , "igor.dolgalev@nyumc.org", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-4451-126X"))
-Description: Data for the msigdbr R package.
+Description: Data for the msigdbr R package. The data was split from the
+    msigdbr package to comply with CRAN package size limits.
 License: MIT + file LICENSE
 URL: https://github.com/igordot/msigdbrdata
 BugReports: https://github.com/igordot/msigdbrdata/issues
@@ -13,12 +14,15 @@ Depends:
     R (>= 3.6)
 Imports:
     dplyr,
+    readr,
     stringr,
     tibble,
     tidyr,
+    tidyselect (>= 1.2.0),
     utils
 Suggests:
     DBI,
+    RCurl,
     rmarkdown,
     roxygen2,
     RSQLite,
