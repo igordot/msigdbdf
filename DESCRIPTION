@@ -11,7 +11,7 @@ License: MIT + file LICENSE
 URL: https://github.com/igordot/msigdbrdata
 BugReports: https://github.com/igordot/msigdbrdata/issues
 Depends:
-    R (>= 3.6)
+    R (>= 4.1)
 Imports:
     dplyr,
     readr,
