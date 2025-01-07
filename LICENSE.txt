@@ -1,0 +1,54 @@
+MIT License
+
+Copyright (c) 2024
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+The contents of MSigDB are protected by copyright (c) 2004-2023 Broad Institute,
+Inc., Massachusetts Institute of Technology, and Regents of the University of
+California, subject to the terms and conditions of the Creative Commons
+Attribution 4.0 International License.
+
+MSigDB gene sets derived from the freely available subset of KEGG MEDICUS are
+protected by copyright, (c) 2009- 2023 Kanehisa Laboratories, all rights
+reserved. They are provided for use in the MSigDB collection subject to the
+terms and conditions of the Creative Commons Attribution-ShareAlike 4.0
+International License. The KEGG MEDICUS derived gene sets are in the MSigDB C2
+collection, and can be recognized by the "KEGG_MEDICUS_" prefix in their name.
+
+MSigDB gene sets derived from KEGG pathways are protected by copyright, (c)
+1995-2017 Kanehisa Laboratories, all rights reserved. They are provided for use
+in the MSigDB collection under license to the Broad Institute, Inc., with
+qualified permission to include in this release. End users are directed to
+http://www.pathway.jp/ and http://www.kegg.jp/kegg/docs/plea.html for
+information on the copyright holder's academic and commercial licensing
+policies. Inclusion of these gene sets herein is conditioned upon acknowledgment
+and retention of the aforementioned copyright, and compliance with such
+policies. These KEGG derived gene sets are in a subcollection MSigDB C2 named
+"KEGG_LEGACY", and can be recognized by the "KEGG_" prefix (without "MEDICUS")
+in their name.
+
+MSigDB gene sets derived from BioCarta pathways are protected by copyright, (c)
+2000-2017 BioCarta, all rights reserved. They are provided under license to the
+Broad Institute, Inc. with qualified permission to include in this release,
+subject to Biocarta's "Disclaimer of Liability and of Warranties" (formerly
+found at www.biocarta.com). Inclusion of these gene sets is conditioned upon
+acknowledgment and retention of the aforementioned copyright, and agreement to
+such disclaimer. The BioCarta derived gene sets are in the MSigDB C2 and M2
+collections, and can be recognized by the "BIOCARTA_" prefix in their name.
