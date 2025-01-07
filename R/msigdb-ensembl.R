@@ -10,6 +10,9 @@
 #' @param x A list of data frames returned by `msigdb_sqlite()`.
 #'
 #' @returns A data frame with Ensembl gene IDs.
+#'
+#' @importFrom readr read_tsv
+#' @importFrom stringr str_glue str_detect
 msigdb_ensembl <- function(x) {
   if (!is.list(x)) {
     stop("Input must be a list of data frames")
@@ -37,7 +40,7 @@ msigdb_ensembl <- function(x) {
   }
 
   # Download the MSigDB Ensembl mappings
-  ens <- read_tsv(ens_url, progress = FALSE, show_col_types = FALSE)
+  ens <- readr::read_tsv(ens_url, progress = FALSE, show_col_types = FALSE)
 
   # Check that the table is the expected size
   if (ncol(ens) != 3) {

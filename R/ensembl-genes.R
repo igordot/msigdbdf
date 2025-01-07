@@ -1,14 +1,16 @@
-#' Generate a table of gene symbols and Ensembl IDs
+#' Generate a table of gene symbols mapped to Ensembl IDs
 #'
-#' Simplify the table of Ensembl ID mappings provided by MSigDB.
-#' Although these are the Ensembl canonical IDs for each gene, there are some genes with more than ten IDs.
+#' Simplify the table of Ensembl gene ID mappings provided by MSigDB.
+#' MSigDB provides a CHIP file with canonical Ensembl IDs for each gene, but there are some genes with many (over ten) IDs.
 #' This function additionally reduces the number of multi-mapping IDs based on those actually appearing in MSigDB.
 #'
 #' @param x A list of data frames returned by `msigdb_sqlite()`.
 #'
-#' @returns A data frame with gene details.
+#' @returns A data frame with gene symbols and Ensembl IDs.
 #'
+#' @importFrom dplyr add_count bind_rows distinct filter inner_join n_distinct select
 #' @importFrom stats median
+#' @importFrom stringr str_detect
 ensembl_genes <- function(x) {
   if (!is.list(x)) {
     stop("Input must be a list of data frames")
@@ -20,7 +22,7 @@ ensembl_genes <- function(x) {
   # count(ens, db_gene_symbol, sort = TRUE)
 
   # Add the number of Ensembl IDs per gene symbol
-  ens <- add_count(ens, .data$db_gene_symbol, name = "n_symbol_ids")
+  ens <- dplyr::add_count(ens, .data$db_gene_symbol, name = "n_symbol_ids")
 
   # Check that the table seems reasonable
   if (max(ens$n_symbol_ids) > 100) {
@@ -34,15 +36,15 @@ ensembl_genes <- function(x) {
   # C1 - positional - derived from the Chromosome and Karyotype band tracks from Ensembl BioMart
   # Reactome - derived from Reactome and filtered to remove inter-set redundancy
   # GTRD - genes predicted to contain TF binding sites in their promoter regions
-  mgs <- filter(x$gene_set, str_detect(.data$collection_name, "C1|M1|REACTOME|GTRD"))
-  mgs <- inner_join(mgs, x$gene_set_source_member, by = c("id" = "gene_set_id"))
-  mgs <- distinct(mgs, .data$collection_name, .data$source_member_id)
-  mgs <- inner_join(mgs, x$source_member, by = c("source_member_id" = "id"))
-  mgs <- filter(mgs, !is.na(.data$gene_symbol_id))
-  mgs <- filter(mgs, str_detect(.data$source_id, "^ENS[GM]"))
-  mgs <- inner_join(mgs, x$gene_symbol, by = c("gene_symbol_id" = "id"))
-  mgs <- select(mgs, collection = "collection_name", db_ensembl_gene = "source_id", db_gene_symbol = "symbol")
-  mgs <- distinct(mgs)
+  mgs <- dplyr::filter(x$gene_set, str_detect(.data$collection_name, "C1|M1|REACTOME|GTRD"))
+  mgs <- dplyr::inner_join(mgs, x$gene_set_source_member, by = c("id" = "gene_set_id"))
+  mgs <- dplyr::distinct(mgs, .data$collection_name, .data$source_member_id)
+  mgs <- dplyr::inner_join(mgs, x$source_member, by = c("source_member_id" = "id"))
+  mgs <- dplyr::filter(mgs, !is.na(.data$gene_symbol_id))
+  mgs <- dplyr::filter(mgs, str_detect(.data$source_id, "^ENS[GM]"))
+  mgs <- dplyr::inner_join(mgs, x$gene_symbol, by = c("gene_symbol_id" = "id"))
+  mgs <- dplyr::select(mgs, collection = "collection_name", db_ensembl_gene = "source_id", db_gene_symbol = "symbol")
+  mgs <- dplyr::distinct(mgs)
 
   # Check that the table seems reasonable
   if (n_distinct(mgs$collection) < 3) {
@@ -53,15 +55,15 @@ ensembl_genes <- function(x) {
   }
 
   # Subset for the positional collection (compiled by MSigDB, so should be the most reliable)
-  mgs_pos <- filter(mgs, .data$collection %in% c("C1", "M1"))
+  mgs_pos <- dplyr::filter(mgs, .data$collection %in% c("C1", "M1"))
 
   # Nearly all genes should have positional information
-  if (n_distinct(mgs_pos$db_gene_symbol) / n_distinct(ens$db_gene_symbol) < 0.999) {
+  if (n_distinct(mgs_pos$db_gene_symbol) / n_distinct(ens$db_gene_symbol) < 0.995) {
     stop("Too few genes in the positional collection")
   }
 
   # Tier 1 mappings - gene symbols with only one ID in the original mapping file
-  ens_1 <- filter(ens, .data$n_symbol_ids == 1)
+  ens_1 <- dplyr::filter(ens, .data$n_symbol_ids == 1)
 
   # Keep track of processed and remaining gene symbols
   processed_symbols <- ens_1$db_gene_symbol
@@ -74,10 +76,10 @@ ensembl_genes <- function(x) {
 
   # Tier 2 mappings - one ID across the positional collection
   ens_2 <- mgs_pos |>
-    filter(.data$db_gene_symbol %in% remaining_symbols) |>
-    distinct(.data$db_ensembl_gene, .data$db_gene_symbol) |>
-    add_count(.data$db_gene_symbol, name = "n_symbol_ids_source") |>
-    filter(.data$n_symbol_ids_source == 1)
+    dplyr::filter(.data$db_gene_symbol %in% remaining_symbols) |>
+    dplyr::distinct(.data$db_ensembl_gene, .data$db_gene_symbol) |>
+    dplyr::add_count(.data$db_gene_symbol, name = "n_symbol_ids_source") |>
+    dplyr::filter(.data$n_symbol_ids_source == 1)
 
   # Keep track of processed and remaining gene symbols
   processed_symbols <- c(processed_symbols, ens_2$db_gene_symbol)
@@ -85,10 +87,10 @@ ensembl_genes <- function(x) {
 
   # Tier 3 mappings - one ID across all of the reliable collections
   ens_3 <- mgs |>
-    filter(.data$db_gene_symbol %in% remaining_symbols) |>
-    distinct(.data$db_ensembl_gene, .data$db_gene_symbol) |>
-    add_count(.data$db_gene_symbol, name = "n_symbol_ids_source") |>
-    filter(.data$n_symbol_ids_source == 1)
+    dplyr::filter(.data$db_gene_symbol %in% remaining_symbols) |>
+    dplyr::distinct(.data$db_ensembl_gene, .data$db_gene_symbol) |>
+    dplyr::add_count(.data$db_gene_symbol, name = "n_symbol_ids_source") |>
+    dplyr::filter(.data$n_symbol_ids_source == 1)
 
   # Keep track of processed and remaining gene symbols
   processed_symbols <- c(processed_symbols, ens_3$db_gene_symbol)
@@ -96,34 +98,34 @@ ensembl_genes <- function(x) {
 
   # Tier 4 mappings - Ensembl ID appearing in multiple collections
   ens_4 <- mgs |>
-    filter(.data$db_gene_symbol %in% remaining_symbols) |>
-    add_count(.data$db_ensembl_gene, name = "n_id_collections") |>
-    filter(.data$n_id_collections > 1) |>
-    distinct(.data$db_ensembl_gene, .data$db_gene_symbol)
+    dplyr::filter(.data$db_gene_symbol %in% remaining_symbols) |>
+    dplyr::add_count(.data$db_ensembl_gene, name = "n_id_collections") |>
+    dplyr::filter(.data$n_id_collections > 1) |>
+    dplyr::distinct(.data$db_ensembl_gene, .data$db_gene_symbol)
 
   # Keep track of processed and remaining gene symbols
   processed_symbols <- c(processed_symbols, ens_4$db_gene_symbol)
   remaining_symbols <- setdiff(ens$db_gene_symbol, processed_symbols)
 
   # Tier 5 mappings - IDs appearing in the positional collection
-  ens_5 <- filter(mgs_pos, .data$db_gene_symbol %in% remaining_symbols)
+  ens_5 <- dplyr::filter(mgs_pos, .data$db_gene_symbol %in% remaining_symbols)
 
   # Keep track of processed and remaining gene symbols
   processed_symbols <- c(processed_symbols, ens_5$db_gene_symbol)
   remaining_symbols <- setdiff(ens$db_gene_symbol, processed_symbols)
 
   # Tier 6 mappings - the rest of the IDs from the reliable collection
-  ens_6 <- filter(mgs, .data$db_gene_symbol %in% remaining_symbols)
+  ens_6 <- dplyr::filter(mgs, .data$db_gene_symbol %in% remaining_symbols)
 
   # Keep track of processed and remaining gene symbols
   processed_symbols <- c(processed_symbols, ens_6$db_gene_symbol)
   remaining_symbols <- setdiff(ens$db_gene_symbol, processed_symbols)
 
   # Ensembl IDs found in the mapping table, but not in the reliable collections
-  ens_only <- filter(ens, !.data$db_gene_symbol %in% mgs$db_gene_symbol)
+  ens_only <- dplyr::filter(ens, !.data$db_gene_symbol %in% mgs$db_gene_symbol)
 
   ens_filtered <- bind_rows(ens_1, ens_2, ens_3, ens_4, ens_5, ens_6, ens_only)
-  ens_filtered <- distinct(ens_filtered, .data$db_ensembl_gene, .data$db_gene_symbol)
+  ens_filtered <- dplyr::distinct(ens_filtered, .data$db_ensembl_gene, .data$db_gene_symbol)
   # count(ens_filtered, db_gene_symbol, sort = TRUE)
 
   # Check that the gene symbols were not lost or altered

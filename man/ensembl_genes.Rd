@@ -2,7 +2,7 @@
 % Please edit documentation in R/ensembl-genes.R
 \name{ensembl_genes}
 \alias{ensembl_genes}
-\title{Generate a table of gene symbols and Ensembl IDs}
+\title{Generate a table of gene symbols mapped to Ensembl IDs}
 \usage{
 ensembl_genes(x)
 }
@@ -10,10 +10,10 @@ ensembl_genes(x)
 \item{x}{A list of data frames returned by \code{msigdb_sqlite()}.}
 }
 \value{
-A data frame with gene details.
+A data frame with gene symbols and Ensembl IDs.
 }
 \description{
-Simplify the table of Ensembl ID mappings provided by MSigDB.
-Although these are the Ensembl canonical IDs for each gene, there are some genes with more than ten IDs.
+Simplify the table of Ensembl gene ID mappings provided by MSigDB.
+MSigDB provides a CHIP file with canonical Ensembl IDs for each gene, but there are some genes with many (over ten) IDs.
 This function additionally reduces the number of multi-mapping IDs based on those actually appearing in MSigDB.
 }

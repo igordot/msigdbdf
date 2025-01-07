@@ -1,13 +1,15 @@
-#' Generate a table of gene details
+#' Generate a table of gene set members
 #'
-#' Convert the MSigDB SQLite database tables to a single table of gene information.
+#' Convert the tables derived from the MSigDB SQLite database to a single table of member genes belonging to each gene set.
+#' The output includes gene symbols, NCBI (formerly Entrez) IDs, and Ensembl IDs for each gene set.
 #'
 #' @param x A list of data frames returned by `msigdb_sqlite()`.
 #'
-#' @returns A data frame with gene details.
+#' @returns A data frame with genes belonging to each gene set.
 #'
-#' @export
-gene_set_genes <- function(x) {
+#' @importFrom dplyr arrange bind_rows case_when inner_join left_join mutate n_distinct select
+#' @importFrom tidyr drop_na replace_na
+gene_set_members <- function(x) {
   if (!is.list(x)) {
     stop("Input must be a list of data frames")
   }
@@ -16,28 +18,28 @@ gene_set_genes <- function(x) {
   }
 
   # Combine internal and external gene set identifiers
-  mg <- inner_join(x$gene_set, x$gene_set_details, by = c("id" = "gene_set_id"))
+  mg <- dplyr::inner_join(x$gene_set, x$gene_set_details, by = c("id" = "gene_set_id"))
 
   # Keep only the relevant columns
-  mg <- select(mg, "id", gs_id = "systematic_name")
+  mg <- dplyr::select(mg, "id", gs_id = "systematic_name")
 
   # Add gene identifiers to link to the source_member table
-  mg <- inner_join(mg, x$gene_set_source_member, by = c("id" = "gene_set_id"))
+  mg <- dplyr::inner_join(mg, x$gene_set_source_member, by = c("id" = "gene_set_id"))
 
   # Save the number of gene-geneset pairs before any modifications
   num_pairs <- nrow(mg)
 
   # Add source (original) gene identifiers
-  mg <- inner_join(mg, x$source_member, by = c("source_member_id" = "id"))
+  mg <- dplyr::inner_join(mg, x$source_member, by = c("source_member_id" = "id"))
 
   # Save the number of source genes before any modifications
   num_source_genes <- n_distinct(mg$source_id)
 
   # Add namespace (identifier database and species)
-  mg <- inner_join(mg, x$namespace, by = c("namespace_id" = "id"))
+  mg <- dplyr::inner_join(mg, x$namespace, by = c("namespace_id" = "id"))
 
   # Add the official NCBI symbol and ID (not all source genes are mapped to a NCBI gene)
-  mg <- inner_join(mg, x$gene_symbol, by = c("gene_symbol_id" = "id"))
+  mg <- dplyr::inner_join(mg, x$gene_symbol, by = c("gene_symbol_id" = "id"))
   mg$NCBI_id <- as.integer(mg$NCBI_id)
 
   # Save the number of gene-geneset pairs with NCBI gene IDs
@@ -53,7 +55,7 @@ gene_set_genes <- function(x) {
   }
 
   # Select and rename columns to match previous msigdbr formatting
-  mg <- select(
+  mg <- dplyr::select(
     mg,
     "gs_id",
     source_gene = "source_id",
@@ -63,10 +65,10 @@ gene_set_genes <- function(x) {
   )
 
   # Replace gene NA values with empty strings to avoid "NA" genes downstream
-  mg <- replace_na(mg, list(db_ncbi_gene = 0, db_gene_symbol = ""))
+  mg <- tidyr::replace_na(mg, list(db_ncbi_gene = 0, db_gene_symbol = ""))
 
   # Keep only the relevant fields
-  mg <- distinct(mg, .data$gs_id, .data$source_gene, .data$db_ncbi_gene, .data$db_gene_symbol)
+  mg <- dplyr::distinct(mg, .data$gs_id, .data$source_gene, .data$db_ncbi_gene, .data$db_gene_symbol)
 
   # Check that the table seems reasonable
   if (n_distinct(mg$db_ncbi_gene) < 30000) {
@@ -86,16 +88,16 @@ gene_set_genes <- function(x) {
   }
 
   # Create subsets with and without known Ensembl IDs
-  mg <- mutate(
+  mg <- dplyr::mutate(
     mg,
     db_ensembl_gene =
-      case_when(
+      dplyr::case_when(
         str_detect(.data$db_gene_symbol, "^ENS[GM]") ~ .data$db_gene_symbol,
         str_detect(.data$source_gene, "^ENS[GM]") ~ .data$source_gene
       )
   )
-  mg_ens <- filter(mg, !is.na(.data$db_ensembl_gene))
-  mg_nonens <- filter(mg, is.na(.data$db_ensembl_gene))
+  mg_ens <- dplyr::filter(mg, !is.na(.data$db_ensembl_gene))
+  mg_nonens <- dplyr::filter(mg, is.na(.data$db_ensembl_gene))
 
   # Confirm that the source genes are distinct
   if (length(intersect(mg_ens$source_gene, mg_nonens$source_gene))) {
@@ -104,22 +106,22 @@ gene_set_genes <- function(x) {
 
   # Add Ensembl IDs to genes without them
   ens <- ensembl_genes(x)
-  mg_nonens <- select(mg_nonens, !"db_ensembl_gene")
+  mg_nonens <- dplyr::select(mg_nonens, !"db_ensembl_gene")
   mg_nonens <- left_join(mg_nonens, ens, by = "db_gene_symbol", relationship = "many-to-many")
 
   # Combine subsets with and without known Ensembl IDs
   mg <- bind_rows(mg_ens, mg_nonens)
 
   # Clean up the final table
-  mg <- distinct(
+  mg <- dplyr::distinct(
     mg,
-    .data$db_ncbi_gene,
     .data$db_gene_symbol,
+    .data$db_ncbi_gene,
     .data$db_ensembl_gene,
     .data$source_gene,
     .data$gs_id
   )
-  mg <- arrange(
+  mg <- dplyr::arrange(
     mg,
     .data$db_gene_symbol,
     .data$db_ensembl_gene,

@@ -2,7 +2,6 @@
 % Please edit documentation in R/msigdbrdata-package.R
 \docType{package}
 \name{msigdbrdata-package}
-\alias{msigdbrdata}
 \alias{msigdbrdata-package}
 \title{msigdbrdata: Data for msigdbr}
 \description{

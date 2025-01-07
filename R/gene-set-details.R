@@ -1,12 +1,14 @@
-#' Generate a table of gene set details
+#' Generate a table of gene sets with details
 #'
-#' Convert the MSigDB SQLite database tables to a single table of gene set information.
+#' Convert the tables derived from the MSigDB SQLite database to a single table of gene set information.
+#' The output includes the full name, description, source publication, and other details for each gene set.
 #'
 #' @param x A list of data frames returned by `msigdb_sqlite()`.
 #'
 #' @returns A data frame with gene set details.
 #'
-#' @export
+#' @importFrom dplyr inner_join left_join select
+#' @importFrom tidyr replace_na separate_wider_delim
 gene_set_details <- function(x) {
   if (!is.list(x)) {
     stop("Input must be a list of data frames")
@@ -16,13 +18,13 @@ gene_set_details <- function(x) {
   }
 
   # Combine core information about each gene set with details
-  mgs <- inner_join(x$gene_set, x$gene_set_details, by = c("id" = "gene_set_id"))
+  mgs <- dplyr::inner_join(x$gene_set, x$gene_set_details, by = c("id" = "gene_set_id"))
 
   # Add publication information
-  mgs <- left_join(mgs, x$publication, by = c("publication_id" = "id"))
+  mgs <- dplyr::left_join(mgs, x$publication, by = c("publication_id" = "id"))
 
   # Extract collection and subcollection information
-  mgs <- separate_wider_delim(
+  mgs <- tidyr::separate_wider_delim(
     mgs,
     cols = "collection_name",
     delim = ":",
@@ -33,7 +35,7 @@ gene_set_details <- function(x) {
   )
 
   # Select and rename the relevant columns
-  mgs <- select(
+  mgs <- dplyr::select(
     mgs,
     "gs_collection",
     "gs_subcollection",
@@ -50,7 +52,7 @@ gene_set_details <- function(x) {
   # mgs <- filter(mgs, gs_cat != "ARCHIVED")
 
   # Replace NA values with empty strings
-  mgs <- replace_na(
+  mgs <- tidyr::replace_na(
     mgs,
     list(
       gs_subcollection = "",

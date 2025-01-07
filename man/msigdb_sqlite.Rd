@@ -16,6 +16,6 @@ A list of data frames.
 Download the MSigDB SQLite database and extract the relevant tables as data frames.
 Each database file holds one MSigDB release for one resource (human or mouse).
 }
-\details{
-MSigDB SQLite database documentation: https://docs.gsea-msigdb.org/#MSigDB/MSigDB_SQLite_Database/
+\references{
+MSigDB SQLite database documentation: \url{https://docs.gsea-msigdb.org/#MSigDB/MSigDB_SQLite_Database/}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/gene-set-details.R
 \name{gene_set_details}
 \alias{gene_set_details}
-\title{Generate a table of gene set details}
+\title{Generate a table of gene sets with details}
 \usage{
 gene_set_details(x)
 }
@@ -13,5 +13,6 @@ gene_set_details(x)
 A data frame with gene set details.
 }
 \description{
-Convert the MSigDB SQLite database tables to a single table of gene set information.
+Convert the tables derived from the MSigDB SQLite database to a single table of gene set information.
+The output includes the full name, description, source publication, and other details for each gene set.
 }
