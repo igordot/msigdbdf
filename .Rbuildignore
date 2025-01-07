@@ -1,7 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^data-raw$
-^LICENSE\.md$
+^LICENSE\.txt$
 ^\.github$
 ^_pkgdown\.yml$
 ^docs$
