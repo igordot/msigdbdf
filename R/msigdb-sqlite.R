@@ -134,7 +134,6 @@ msigdb_sqlite <- function(x) {
   db_list$collection <- tibble::as_tibble(dplyr::tbl(db, "collection"))
   db_list$collection <- dplyr::select(
     db_list$collection,
-    .data$id,
     .data$collection_name,
     .data$full_name,
     .data$description

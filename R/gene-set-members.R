@@ -40,7 +40,7 @@ gene_set_members <- function(x) {
 
   # Add the official NCBI symbol and ID (not all source genes are mapped to a NCBI gene)
   mg <- dplyr::inner_join(mg, x$gene_symbol, by = c("gene_symbol_id" = "id"))
-  mg$NCBI_id <- as.integer(mg$NCBI_id)
+  mg$NCBI_id <- mg$NCBI_id
 
   # Save the number of gene-geneset pairs with NCBI gene IDs
   num_pairs_ncbi <- nrow(mg)
@@ -55,6 +55,7 @@ gene_set_members <- function(x) {
   }
 
   # Select and rename columns to match previous msigdbr formatting
+  # NCBI_id is stored as character (also in Bioconductor org.*.db and TxDb.* packages)
   mg <- dplyr::select(
     mg,
     "gs_id",
@@ -65,7 +66,7 @@ gene_set_members <- function(x) {
   )
 
   # Replace gene NA values with empty strings to avoid "NA" genes downstream
-  mg <- tidyr::replace_na(mg, list(db_ncbi_gene = 0, db_gene_symbol = ""))
+  mg <- tidyr::replace_na(mg, list(db_ncbi_gene = "", db_gene_symbol = ""))
 
   # Keep only the relevant fields
   mg <- dplyr::distinct(mg, .data$gs_id, .data$source_gene, .data$db_ncbi_gene, .data$db_gene_symbol)

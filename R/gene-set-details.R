@@ -17,8 +17,11 @@ gene_set_details <- function(x) {
     stop("MSigDB data frame must have one row")
   }
 
+  # Combine core information about each gene set with the collection names
+  mgs <- dplyr::left_join(x$gene_set, x$collection, by = "collection_name")
+
   # Combine core information about each gene set with details
-  mgs <- dplyr::inner_join(x$gene_set, x$gene_set_details, by = c("id" = "gene_set_id"))
+  mgs <- dplyr::inner_join(mgs, x$gene_set_details, by = c("id" = "gene_set_id"))
 
   # Add publication information
   mgs <- dplyr::left_join(mgs, x$publication, by = c("publication_id" = "id"))
@@ -37,10 +40,11 @@ gene_set_details <- function(x) {
   # Select and rename the relevant columns
   mgs <- dplyr::select(
     mgs,
-    "gs_collection",
-    "gs_subcollection",
     gs_id = "systematic_name",
     gs_name = "standard_name",
+    "gs_collection",
+    "gs_subcollection",
+    gs_collection_name = "full_name",
     gs_description = "description_brief",
     gs_source_species = "source_species_code",
     gs_pmid = "PMID",
@@ -77,8 +81,11 @@ gene_set_details <- function(x) {
   mgs <- arrange(mgs, .data$gs_name, .data$gs_id)
 
   # Check that the final table seems reasonable
-  if (ncol(mgs) != 11) {
+  if (ncol(mgs) < 12) {
     stop("Missing columns")
+  }
+  if (ncol(mgs) > 12) {
+    stop("Extra columns")
   }
   if (nrow(mgs) != nrow(x$gene_set)) {
     stop("Some gene sets were lost during merging")
