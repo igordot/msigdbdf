@@ -9,6 +9,13 @@
 #'
 #' @return A tibble (a data frame with class [`tbl_df`]) of gene sets with one gene per row.
 #'
+#' @references
+#' Subramanian A, Tamayo P, Mootha VK, Mukherjee S, Ebert BL, Gillette MA, Paulovich A, Pomeroy SL, Golub TR, Lander ES, Mesirov JP. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. *Proc Natl Acad Sci*. 2005 Oct 25;102(43):15545-50. \doi{10.1073/pnas.0506580102}
+#'
+#' Liberzon A, Birger C, Thorvaldsdóttir H, Ghandi M, Mesirov JP, Tamayo P. The Molecular Signatures Database (MSigDB) hallmark gene set collection. *Cell Syst*. 2015 Dec 23;1(6):417-425. \doi{10.1016/j.cels.2015.12.004}
+#'
+#' Castanza AS, Recla JM, Eby D, Thorvaldsdóttir H, Bult CJ, Mesirov JP. Extending support for mouse data in the Molecular Signatures Database (MSigDB). *Nat Methods*. 2023 Nov;20(11):1619-1620. \doi{10.1038/s41592-023-02014-7}
+#'
 #' @importFrom dplyr arrange inner_join
 #'
 #' @export
