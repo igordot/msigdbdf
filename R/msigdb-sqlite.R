@@ -12,12 +12,9 @@
 #' @importFrom dplyr filter select tbl
 #' @importFrom tibble as_tibble
 msigdb_sqlite <- function(x) {
-  if (!requireNamespace("DBI", quietly = TRUE)) {
-    stop("Package 'DBI' must be installed to use this function")
-  }
-  if (!requireNamespace("RSQLite", quietly = TRUE)) {
-    stop("Package 'RSQLite' must be installed to use this function")
-  }
+  rlang::check_installed("DBI")
+  rlang::check_installed("RSQLite")
+  rlang::check_installed("RCurl")
 
   # Define MSigDB download variables
   # https://data.broadinstitute.org/gsea-msigdb/msigdb/release/
@@ -28,10 +25,8 @@ msigdb_sqlite <- function(x) {
   mdb_zip_url <- str_glue("{url_base}/release/{mdb_version}/{mdb_zip}")
 
   # Check that the database version and the resulting URL are valid
-  if (requireNamespace("RCurl", quietly = TRUE)) {
-    if (!RCurl::url.exists(mdb_zip_url)) {
-      stop("The MSigDB SQLite file URL does not exist: ", mdb_zip_url)
-    }
+  if (!RCurl::url.exists(mdb_zip_url)) {
+    stop("The MSigDB SQLite file URL does not exist: ", mdb_zip_url)
   }
 
   # Download the MSigDB SQLite file
