@@ -1,19 +1,16 @@
+# Both the data and the code to generate the data are included in the msigdbdf package
+# All functions are internal and are not meant to be public-facing
+
 # Set the MSigDB database version -----
 
 msigdb_version <- "2024.1"
 
 # Load packages -----
 
-# Both the data and the code to generate the data are included in the msigdbdf package
-# All functions are internal and are not meant to be public-facing
-
 library(dplyr)
 library(stringr)
 
 # Import MSigDB gene sets -----
-
-# check if all tables are used
-# forgot collections
 
 # Each database file holds one MSigDB release for one resource (human or mouse)
 

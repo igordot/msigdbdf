@@ -22,6 +22,8 @@
 msigdbdf <- function(target_species = c("HS", "MM")) {
   target_species <- toupper(target_species)
   target_species <- match.arg(target_species)
+
+  # Select tables based on target species
   if (target_species == "HS") {
     mdb <- dplyr::inner_join(gene_set_members_hs, gene_set_details_hs, by = "gs_id")
   }
@@ -29,6 +31,7 @@ msigdbdf <- function(target_species = c("HS", "MM")) {
     mdb <- dplyr::inner_join(gene_set_members_mm, gene_set_details_mm, by = "gs_id")
   }
 
+  # Sort by gene set so multiple genes are clearly visible
   mdb <- dplyr::arrange(
     mdb,
     .data$gs_id,
