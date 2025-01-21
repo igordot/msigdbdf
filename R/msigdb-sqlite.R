@@ -16,11 +16,12 @@ msigdb_sqlite <- function(x) {
   rlang::check_installed("RSQLite")
   rlang::check_installed("RCurl")
 
-  # Define MSigDB download variables
-  # https://data.broadinstitute.org/gsea-msigdb/msigdb/release/
+  # Define file names and MSigDB download variables
   mdb_version <- x
   mdb_db <- str_glue("msigdb_v{mdb_version}.db")
   mdb_zip <- str_glue("{mdb_db}.zip")
+  temp_mdb_db <- file.path(tempdir(), mdb_db)
+  temp_mdb_zip <- file.path(tempdir(), mdb_zip)
   url_base <- "https://data.broadinstitute.org/gsea-msigdb/msigdb"
   mdb_zip_url <- str_glue("{url_base}/release/{mdb_version}/{mdb_zip}")
 
@@ -29,17 +30,17 @@ msigdb_sqlite <- function(x) {
     stop("The MSigDB SQLite file URL does not exist: ", mdb_zip_url)
   }
 
-  # Download the MSigDB SQLite file
-  options(timeout = 100)
-  download.file(url = mdb_zip_url, destfile = mdb_zip)
-  unzip(mdb_zip)
+  # Reset options when changing inside a package functions (mandatory for CRAN)
+  old_options <- options(timeout = 100)
+  on.exit(options(old_options))
 
-  # Check MSigDB SQLite file size in bytes
-  # utils:::format.object_size(file.size(mdb_db), units = "auto")
+  # Download the MSigDB SQLite file
+  download.file(url = mdb_zip_url, destfile = temp_mdb_zip)
+  unzip(temp_mdb_zip, exdir = tempdir())
 
   # Open database connection to SQLite file and extract tables as tibbles
   # https://docs.gsea-msigdb.org/#MSigDB/MSigDB_SQLite_Database/
-  db <- DBI::dbConnect(RSQLite::SQLite(), dbname = mdb_db, flags = RSQLite::SQLITE_RO)
+  db <- DBI::dbConnect(RSQLite::SQLite(), dbname = temp_mdb_db, flags = RSQLite::SQLITE_RO)
 
   db_list <- list()
 
@@ -138,8 +139,8 @@ msigdb_sqlite <- function(x) {
   DBI::dbDisconnect(db)
 
   # Delete the downloaded file
-  file.remove(mdb_zip)
-  file.remove(mdb_db)
+  file.remove(temp_mdb_zip)
+  file.remove(temp_mdb_db)
 
   return(db_list)
 }
