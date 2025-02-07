@@ -3,9 +3,9 @@
 \docType{package}
 \name{msigdbdf-package}
 \alias{msigdbdf-package}
-\title{msigdbdf: MSigDB Data for 'msigdbr'}
+\title{msigdbdf: MSigDB Data Frame}
 \description{
-Provides the Molecular Signatures Database (MSigDB) gene sets (Subramanian et al. 2005 \doi{10.1073/pnas.0506580102}, Liberzon et al. 2015 \doi{10.1016/j.cels.2015.12.004}, Castanza et al. 2023 \doi{10.1038/s41592-023-02014-7}) in an R data frame. Serves as the data source for the 'msigdbr' package.
+Provides the Molecular Signatures Database (MSigDB) gene sets (Subramanian et al. 2005 \doi{10.1073/pnas.0506580102}, Liberzon et al. 2015 \doi{10.1016/j.cels.2015.12.004}, Castanza et al. 2023 \doi{10.1038/s41592-023-02014-7}) in an R data frame. Serves as the data source for 'msigdbr' \doi{10.32614/CRAN.package.msigdbr} (split into a separate package due to CRAN size restrictions).
 }
 \seealso{
 Useful links:
