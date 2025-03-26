@@ -81,6 +81,7 @@ msigdb_sqlite <- function(x) {
     .data$description_brief,
     .data$description_full,
     .data$systematic_name,
+    .data$exact_source,
     .data$external_details_URL,
     .data$source_species_code,
     .data$publication_id,

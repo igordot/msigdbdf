@@ -49,6 +49,7 @@ gene_set_details <- function(x) {
     gs_source_species = "source_species_code",
     gs_pmid = "PMID",
     gs_geoid = "GEO_id",
+    gs_exact_source = "exact_source",
     gs_url = "external_details_URL"
   )
 
@@ -63,6 +64,7 @@ gene_set_details <- function(x) {
       gs_description = "",
       gs_pmid = "",
       gs_geoid = "",
+      gs_exact_source = "",
       gs_url = ""
     )
   )
@@ -81,10 +83,10 @@ gene_set_details <- function(x) {
   mgs <- arrange(mgs, .data$gs_name, .data$gs_id)
 
   # Check that the final table seems reasonable
-  if (ncol(mgs) < 12) {
+  if (ncol(mgs) < 13) {
     stop("Missing columns")
   }
-  if (ncol(mgs) > 12) {
+  if (ncol(mgs) > 13) {
     stop("Extra columns")
   }
   if (nrow(mgs) != nrow(x$gene_set)) {
