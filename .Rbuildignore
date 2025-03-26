@@ -3,10 +3,10 @@
 ^data-raw$
 ^LICENSE\.txt$
 ^\.github$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
+^CRAN-RELEASE$
+^revdep$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
-^cran-comments\.md$
-^CRAN-RELEASE$
-^CRAN-SUBMISSION$
-^revdep$
