@@ -10,7 +10,7 @@ msigdbdf(target_species = c("HS", "MM"))
 \item{target_species}{Species abbreviation for human or mouse databases (\code{"HS"} or \code{"MM"}).}
 }
 \value{
-A tibble (a data frame with class \code{\link[tibble:tbl_df-class]{tibble::tbl_df}}) of gene sets with one gene per row.
+A data frame of gene sets with one gene per row.
 }
 \description{
 Retrieve a data frame of MSigDB gene sets and their member genes.

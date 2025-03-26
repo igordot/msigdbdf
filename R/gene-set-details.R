@@ -81,6 +81,7 @@ gene_set_details <- function(x) {
   # Clean up the final table
   mgs <- distinct(mgs)
   mgs <- arrange(mgs, .data$gs_name, .data$gs_id)
+  mgs <- as.data.frame(mgs, stringsAsFactors = FALSE)
 
   # Check that the final table seems reasonable
   if (ncol(mgs) < 13) {

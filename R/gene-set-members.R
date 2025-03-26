@@ -129,6 +129,7 @@ gene_set_members <- function(x) {
     .data$source_gene,
     .data$gs_id
   )
+  mg <- as.data.frame(mg, stringsAsFactors = FALSE)
 
   # Check that the table seems reasonable
   if (length(setdiff(drop_na(x$source_member)$source_id, mg$source_gene))) {

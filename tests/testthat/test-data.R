@@ -8,7 +8,7 @@ test_that("gene_set_details", {
 
 test_that("gene_set_details_hs", {
   dhs <- gene_set_details_hs
-  expect_s3_class(dhs, "tbl_df")
+  expect_s3_class(dhs, "data.frame")
   expect_equal(n_distinct(dhs$db_version), 1)
   expect_identical(unique(dhs$db_target_species), "HS")
   expect_gt(nrow(dhs), 10000)
@@ -17,7 +17,7 @@ test_that("gene_set_details_hs", {
 
 test_that("gene_set_details_mm", {
   dmm <- gene_set_details_mm
-  expect_s3_class(dmm, "tbl_df")
+  expect_s3_class(dmm, "data.frame")
   expect_equal(n_distinct(dmm$db_version), 1)
   expect_identical(unique(dmm$db_target_species), "MM")
   expect_gt(nrow(dmm), 10000)
@@ -31,7 +31,7 @@ test_that("gene_set_members", {
 
 test_that("gene_set_members_hs", {
   mhs <- gene_set_members_hs
-  expect_s3_class(mhs, "tbl_df")
+  expect_s3_class(mhs, "data.frame")
   expect_gt(nrow(mhs), 1000000)
   expect_gt(n_distinct(mhs$gs_id), 10000)
   expect_gt(n_distinct(mhs$db_gene_symbol), 20000)
@@ -41,7 +41,7 @@ test_that("gene_set_members_hs", {
 
 test_that("gene_set_members_mm", {
   mmm <- gene_set_members_mm
-  expect_s3_class(mmm, "tbl_df")
+  expect_s3_class(mmm, "data.frame")
   expect_gt(nrow(mmm), 1000000)
   expect_gt(n_distinct(mmm$gs_id), 10000)
   expect_gt(n_distinct(mmm$db_gene_symbol), 20000)

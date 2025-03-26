@@ -7,7 +7,7 @@
 #'
 #' @param target_species Species abbreviation for human or mouse databases (`"HS"` or `"MM"`).
 #'
-#' @return A tibble (a data frame with class [`tibble::tbl_df`]) of gene sets with one gene per row.
+#' @return A data frame of gene sets with one gene per row.
 #'
 #' @references
 #' Subramanian A, Tamayo P, Mootha VK, Mukherjee S, Ebert BL, Gillette MA, Paulovich A, Pomeroy SL, Golub TR, Lander ES, Mesirov JP. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. *Proc Natl Acad Sci*. 2005 Oct 25;102(43):15545-50. \doi{10.1073/pnas.0506580102}
@@ -39,6 +39,9 @@ msigdbdf <- function(target_species = c("HS", "MM")) {
     .data$db_ensembl_gene,
     .data$source_gene
   )
+
+  # Confirm that the object is a data frame
+  mdb <- as.data.frame(mdb, stringsAsFactors = FALSE)
 
   return(mdb)
 }

@@ -1,6 +1,6 @@
 test_that("msigdbdf() human", {
   mdb <- msigdbdf(target_species = "HS")
-  expect_s3_class(mdb, "tbl_df")
+  expect_s3_class(mdb, "data.frame")
   expect_gt(nrow(mdb), 4400000)
   expect_lt(nrow(mdb), 4500000)
   expect_identical(names(mdb)[1:6], c("db_gene_symbol", "db_ncbi_gene", "db_ensembl_gene", "source_gene", "gs_id", "gs_name"))
@@ -73,7 +73,7 @@ test_that("msigdbdf() human", {
 
 test_that("msigdbdf() mouse", {
   mdb <- msigdbdf(target_species = "MM")
-  expect_s3_class(mdb, "tbl_df")
+  expect_s3_class(mdb, "data.frame")
   expect_gt(nrow(mdb), 1600000)
   expect_lt(nrow(mdb), 1700000)
   expect_equal(n_distinct(mdb$db_version), 1)
