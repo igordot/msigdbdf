@@ -32,6 +32,9 @@ test_that("gene_set_members", {
 test_that("gene_set_members_hs", {
   mhs <- gene_set_members_hs
   expect_s3_class(mhs, "data.frame")
+  expect_type(mhs$db_gene_symbol, "character")
+  expect_type(mhs$db_ncbi_gene, "character")
+  expect_type(mhs$db_ensembl_gene, "character")
   expect_gt(nrow(mhs), 1000000)
   expect_gt(n_distinct(mhs$gs_id), 10000)
   expect_gt(n_distinct(mhs$db_gene_symbol), 20000)
@@ -42,6 +45,9 @@ test_that("gene_set_members_hs", {
 test_that("gene_set_members_mm", {
   mmm <- gene_set_members_mm
   expect_s3_class(mmm, "data.frame")
+  expect_type(mmm$db_gene_symbol, "character")
+  expect_type(mmm$db_ncbi_gene, "character")
+  expect_type(mmm$db_ensembl_gene, "character")
   expect_gt(nrow(mmm), 1000000)
   expect_gt(n_distinct(mmm$gs_id), 10000)
   expect_gt(n_distinct(mmm$db_gene_symbol), 20000)
