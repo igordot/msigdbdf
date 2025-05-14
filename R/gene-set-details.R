@@ -9,6 +9,8 @@
 #'
 #' @importFrom dplyr inner_join left_join select
 #' @importFrom tidyr replace_na separate_wider_delim
+#'
+#' @noRd
 gene_set_details <- function(x) {
   if (!is.list(x)) {
     stop("Input must be a list of data frames")

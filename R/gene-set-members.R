@@ -9,6 +9,8 @@
 #'
 #' @importFrom dplyr arrange bind_rows case_when inner_join left_join mutate n_distinct select
 #' @importFrom tidyr drop_na replace_na
+#'
+#' @noRd
 gene_set_members <- function(x) {
   if (!is.list(x)) {
     stop("Input must be a list of data frames")

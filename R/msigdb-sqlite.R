@@ -11,6 +11,8 @@
 #'
 #' @importFrom dplyr filter select tbl
 #' @importFrom tibble as_tibble
+#'
+#' @noRd
 msigdb_sqlite <- function(x) {
   rlang::check_installed("DBI")
   rlang::check_installed("RSQLite")

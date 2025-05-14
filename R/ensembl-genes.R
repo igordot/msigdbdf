@@ -11,6 +11,8 @@
 #' @importFrom dplyr add_count bind_rows distinct filter inner_join n_distinct select
 #' @importFrom stats median
 #' @importFrom stringr str_detect
+#'
+#' @noRd
 ensembl_genes <- function(x) {
   if (!is.list(x)) {
     stop("Input must be a list of data frames")

@@ -13,6 +13,8 @@
 #'
 #' @importFrom readr read_tsv
 #' @importFrom stringr str_glue str_detect
+#'
+#' @noRd
 msigdb_ensembl <- function(x) {
   if (!is.list(x)) {
     stop("Input must be a list of data frames")
