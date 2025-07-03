@@ -1,9 +1,9 @@
 # Both the data and the code to generate the data are included in the msigdbdf package
-# All functions are internal and are not meant to be public-facing
+# All functions except msigdbdf() are internal and are not meant to be public-facing
 
 # Set the MSigDB database version -----
 
-msigdb_version <- "2024.1"
+msigdb_version <- "2025.1"
 
 # Load packages -----
 
